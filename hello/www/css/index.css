@@ -23,4 +23,5 @@
  .map-button
  {
     text-transform : uppercase;
+    margin: 3px 5px;
  }
