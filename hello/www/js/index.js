@@ -56,55 +56,99 @@ function onError(error) {
 }
 let apiKey = "3265e6694d3fc0f59b2ac9fff276f76bb1e84699";
 
+let markers = [];
+
 afficherMarkers('lyon');
 
 afficherButton();
 
 function afficherButton()
 {
-    const request2 = new Request(`https://api.jcdecaux.com/vls/v3/contracts?apiKey=${apiKey}`);
+    const request = new Request(`https://api.jcdecaux.com/vls/v3/contracts?apiKey=${apiKey}`);
 
-    fetch(request2)
+    fetch(request)
     .then((response) => response.json())
     .then((json)=>
     {
         json.sort((a, b) => a.name.localeCompare(b.name));
         let div = document.getElementById('selectButton');
-    json.forEach((element) =>
-    {
-        let button = document.createElement('button');
-        button.innerHTML = element.name;
-
-        button.addEventListener('click', (e)=>
+        json.forEach((element) =>
         {
-            e.preventDefault();
-            afficherMarkers(element.name)
-        });
+            let button = document.createElement('button');
+            button.innerHTML = element.name;
+            button.classList.add('map-button');
+            button.classList.add('w3-button');
+            button.classList.add('w3-round-xlarge');
+            button.classList.add('w3-large');
+            button.classList.add('w3-white');
+            button.classList.add('w3-border');
+            button.classList.add('w3-border-blue');
+            button.classList.add('w3-hover-blue');
+            button.addEventListener('click', (e)=>
+            {
+                e.preventDefault();
+                afficherMarkers(element.name)
+            });
 
-        div.appendChild(button);
-    })(element)
+            div.appendChild(button);
+        })
 
-    
     })
-
 }
  
 function afficherMarkers(name)
 {
+
+    if(markers.length > 0)
+    {
+        markers.forEach((e)=>
+        {
+            map.removeLayer(e);
+        })
+        markers=[];
+    }
     const request = new Request(`https://api.jcdecaux.com/vls/v3/stations?contract=${name}&apiKey=${apiKey}`);
     fetch(request)
     .then((response) => response.json())
     .then((json)=>
     {
-       console.log(json);
        json.forEach((element) =>
        {
         let markup = L.marker([element.position.latitude, element.position.longitude]).addTo(map);
-        markup.bindPopup(`<b>${element.name}</b><br>Adresse : ${element.address}<br>Status : ${element.status}<br>Nombre de place : ${element.mainStands.capacity}<br>Vélos diponible : ${element.mainStands.capacity - element.mainStands.availabilities.stands}`).openPopup();
-        
+        markup.bindPopup(`<b>${element.name}</b><br>Adresse : ${element.address}<br>Status : ${element.status}<br>Nombre de place totales : ${element.mainStands.capacity}<br>Places vides : ${element.mainStands.capacity - element.mainStands.availabilities.bikes}<br>Vélos disponible : ${element.mainStands.capacity - element.mainStands.availabilities.stands}`).openPopup();
+        markers.push(markup);
        })
+
+       deplacerCarte(markers);
     })
 }
+
+
+function deplacerCarte(liste)
+{
+    if(liste.length>0)
+    {
+
+        let latitude=0;
+        let longitude =0;
+
+        liste.forEach((e)=>
+        {
+            latitude += e._latlng.lat;
+            longitude += e._latlng.lng;
+        })
+
+        latitude /= liste.length;
+
+        longitude /= liste.length;
+
+        map.setView([latitude,longitude],14);
+
+    }
+
+}
+
+
 
 // api jcdecaux for developpers
 // leaflet

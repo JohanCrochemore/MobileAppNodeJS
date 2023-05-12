@@ -19,3 +19,8 @@
 
 
  #map { height: 450px; }
+
+ .map-button
+ {
+    text-transform : uppercase;
+ }
