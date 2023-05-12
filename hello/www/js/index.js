@@ -115,7 +115,7 @@ function afficherMarkers(name)
        json.forEach((element) =>
        {
         let markup = L.marker([element.position.latitude, element.position.longitude]).addTo(map);
-        markup.bindPopup(`<b>${element.name}</b><br>Adresse : ${element.address}<br>Status : ${element.status}<br>Nombre de place totales : ${element.mainStands.capacity}<br>Places vides : ${element.mainStands.capacity - element.mainStands.availabilities.bikes}<br>Vélos disponible : ${element.mainStands.capacity - element.mainStands.availabilities.stands}`).openPopup();
+        markup.bindPopup(`<b>${element.name}</b><br>Adresse : ${element.address}<br>Status : ${element.status}<br>Nombre de place totales : ${element.mainStands.capacity}<br>Places vides : ${element.mainStands.capacity - element.mainStands.availabilities.bikes}<br>Vélos disponible : ${element.mainStands.capacity - element.mainStands.availabilities.stands}`);
         markers.push(markup);
        })
 
