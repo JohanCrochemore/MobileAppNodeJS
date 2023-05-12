@@ -19,6 +19,9 @@
 
 // Wait for the deviceready event before using any of Cordova's device APIs.
 // See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
+
+
+
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady() {
@@ -27,3 +30,83 @@ function onDeviceReady() {
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
 }
+
+
+var map = L.map('map').setView([44, 2], 14);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+var options = {
+    enableHighAccuracy: true,
+    maximumAge: 3600000
+}
+var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+function onSuccess(position) {
+
+    map.setView([position.coords.latitude, position.coords.longitude ], 14);
+
+};
+
+function onError(error) {
+    alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
+}
+let apiKey = "3265e6694d3fc0f59b2ac9fff276f76bb1e84699";
+
+afficherMarkers('lyon');
+
+afficherButton();
+
+function afficherButton()
+{
+    const request2 = new Request(`https://api.jcdecaux.com/vls/v3/contracts?apiKey=${apiKey}`);
+
+    fetch(request2)
+    .then((response) => response.json())
+    .then((json)=>
+    {
+        json.sort((a, b) => a.name.localeCompare(b.name));
+        let div = document.getElementById('selectButton');
+    json.forEach((element) =>
+    {
+        let button = document.createElement('button');
+        button.innerHTML = element.name;
+
+        button.addEventListener('click', (e)=>
+        {
+            e.preventDefault();
+            afficherMarkers(element.name)
+        });
+
+        div.appendChild(button);
+    })(element)
+
+    
+    })
+
+}
+ 
+function afficherMarkers(name)
+{
+    const request = new Request(`https://api.jcdecaux.com/vls/v3/stations?contract=${name}&apiKey=${apiKey}`);
+    fetch(request)
+    .then((response) => response.json())
+    .then((json)=>
+    {
+       console.log(json);
+       json.forEach((element) =>
+       {
+        let markup = L.marker([element.position.latitude, element.position.longitude]).addTo(map);
+        markup.bindPopup(`<b>${element.name}</b><br>Adresse : ${element.address}<br>Status : ${element.status}<br>Nombre de place : ${element.mainStands.capacity}<br>Vélos diponible : ${element.mainStands.capacity - element.mainStands.availabilities.stands}`).openPopup();
+        
+       })
+    })
+}
+
+// api jcdecaux for developpers
+// leaflet
+
+// ionic- capacitor
