@@ -147,10 +147,3 @@ function deplacerCarte(liste)
     }
 
 }
-
-
-
-// api jcdecaux for developpers
-// leaflet
-
-// ionic- capacitor
